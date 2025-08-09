@@ -5,6 +5,7 @@
 import logging
 from typing import List, Dict, Any, Optional, Union
 import os
+from dotenv import load_dotenv
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -16,6 +17,9 @@ from qdrant_client.http import models
 
 from .ollama_embeddings import OllamaEmbeddings
 
+# Загружаем переменные окружения
+load_dotenv()
+
 # Настройка логирования
 logger = logging.getLogger(__name__)
 
@@ -25,9 +29,9 @@ class QdrantManager:
 
     def __init__(
         self,
-        collection_name: str = "ppee_applications",
-        host: str = "localhost",
-        port: int = 6333,
+        collection_name: str = None,
+        host: str = None,
+        port: int = None,
         embeddings_type: str = "huggingface",  # Новый параметр для выбора типа эмбеддингов
         model_name: str = "BAAI/bge-m3",
         vector_size: int = 1024,
@@ -55,9 +59,10 @@ class QdrantManager:
             ollama_options: Опции для Ollama API
             ollama_keep_alive: Время хранения модели в памяти Ollama
         """
-        self.collection_name = collection_name
-        self.host = host
-        self.port = port
+        # Используем переменные окружения, если параметры не переданы явно
+        self.collection_name = collection_name or os.environ.get("QDRANT_COLLECTION_NAME", "ppee_applications")
+        self.host = host or os.environ.get("QDRANT_HOST", "localhost")
+        self.port = port or int(os.environ.get("QDRANT_PORT", "6333"))
         self.model_name = model_name
         self.vector_size = vector_size
         self.device = device

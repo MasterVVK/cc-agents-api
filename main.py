@@ -7,6 +7,7 @@ import redis.asyncio as redis
 import json
 import logging
 import os
+from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -23,6 +24,9 @@ from langchain_core.documents import Document
 
 # Импорт локальных адаптеров
 from app.adapters.llm_adapter import OllamaLLMProvider
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -56,6 +60,11 @@ analysis_llm_semaphore = None
 
 # Настройки очистки памяти
 OLLAMA_KEEP_ALIVE = os.environ.get("OLLAMA_KEEP_ALIVE", "10s")  # Время хранения модели Ollama в памяти
+
+# Настройки Qdrant
+QDRANT_COLLECTION_NAME = os.environ.get("QDRANT_COLLECTION_NAME", "ppee_applications")  # Название коллекции в Qdrant
+QDRANT_HOST = os.environ.get("QDRANT_HOST", "localhost")
+QDRANT_PORT = int(os.environ.get("QDRANT_PORT", "6333"))
 
 
 # Pydantic модели
@@ -1249,9 +1258,9 @@ async def lifespan(app: FastAPI):
     qdrant_manager = await loop.run_in_executor(
         executor,
         lambda: QdrantManager(
-            collection_name="ppee_applications",
-            host="localhost",
-            port=6333,
+            collection_name=QDRANT_COLLECTION_NAME,
+            host=QDRANT_HOST,
+            port=QDRANT_PORT,
             embeddings_type="ollama",
             model_name="bge-m3",
             ollama_url="http://localhost:11434",

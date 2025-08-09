@@ -1,10 +1,14 @@
 import os
 import logging
 from typing import List, Dict, Any, Optional
+from dotenv import load_dotenv
 
 from ppee_analyzer.vector_store import QdrantManager, BGEReranker
 from langchain_core.documents import Document
 from qdrant_client.http import models
+
+# Загружаем переменные окружения
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -13,9 +17,9 @@ class QdrantAdapter:
     """Адаптер для работы с Qdrant через ppee_analyzer"""
 
     def __init__(self,
-                 host: str = "localhost",
-                 port: int = 6333,
-                 collection_name: str = "ppee_applications",
+                 host: str = None,
+                 port: int = None,
+                 collection_name: str = None,
                  embeddings_type: str = "ollama",
                  model_name: str = "bge-m3",
                  device: str = "cuda",
@@ -44,9 +48,10 @@ class QdrantAdapter:
             min_vram_mb: Минимальное количество свободной VRAM в МБ для использования GPU
             read_only: Только для чтения (без обработки документов)
         """
-        self.host = host
-        self.port = port
-        self.collection_name = collection_name
+        # Используем переменные окружения, если параметры не переданы явно
+        self.host = host or os.environ.get("QDRANT_HOST", "localhost")
+        self.port = port or int(os.environ.get("QDRANT_PORT", "6333"))
+        self.collection_name = collection_name or os.environ.get("QDRANT_COLLECTION_NAME", "ppee_applications")
         self.embeddings_type = embeddings_type
         self.model_name = model_name
         self.device = device

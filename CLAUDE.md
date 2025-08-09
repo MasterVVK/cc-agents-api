@@ -28,6 +28,23 @@ pip install -r requirements.txt
 # - Redis сервер (для очередей задач)
 ```
 
+### Переменные окружения
+```bash
+# Создайте файл .env на основе .env.example
+cp .env.example .env
+
+# Основные переменные:
+QDRANT_COLLECTION_NAME=ppee_applications  # Название коллекции в Qdrant
+QDRANT_HOST=localhost                     # Хост Qdrant сервера
+QDRANT_PORT=6333                         # Порт Qdrant сервера
+OLLAMA_KEEP_ALIVE=10s                    # Время хранения модели в памяти Ollama
+```
+
+Переменные окружения автоматически загружаются во всех модулях:
+- `main.py` - основное приложение
+- `app/adapters/qdrant_adapter.py` - адаптер Qdrant
+- `ppee_analyzer/vector_store/qdrant_manager.py` - менеджер векторной БД
+
 ### Тестирование
 ```bash
 # Тестовые эндпоинты доступны в test_main.http
